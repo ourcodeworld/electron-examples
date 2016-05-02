@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Our Code World Camera Demo</title>
+  </head>
+  <body>
+      <div style="width:100%; text-align: center;">
+          <img src="http://ourcodeworld.com/resources/img/ocw-empty.png" style="width:100px; text-align: center; margin: 0 auto;"/>
+      </div>
+      <br>
+      <div>
+          <!-- Create a camera element centered -->
+          <div id="camdemo" style="width: 320px; height: 240px; text-align: center; margin: 0 auto;"></div>
+          <br>
+            <div style="text-align:center;">
+                <input type="button" id="start" value="Start / Shut down camera"/>
+                <input type="button" id="savefile" value="Save photo in Desktop"/>
+            </div>
+      </div>
+      <script>
+            var enabled = false;
+            var WebCamera = require("webcamjs");
+            var remote = require('remote'); // Load remote component that contains the dialog dependency
+            var dialog = remote.require('dialog'); // Load the dialogs component of the OS
+            var fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
+
+            document.getElementById("start").addEventListener('click',function(){
+                if(!enabled){
+                    enabled = true;
+                    WebCamera.attach('#camdemo');
+                    console.log("The camera has been started");
+                }else{
+                    enabled = false;
+                    WebCamera.reset();
+                    console.log("The camera has been disabled");
+                }
+            },false);
+
+            function processBase64Image(dataString) {
+              var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),response = {};
+
+              if (matches.length !== 3) {
+                  return new Error('Invalid input string');
+              }
+
+              response.type = matches[1];
+              response.data = new Buffer(matches[2], 'base64');
+
+              return response;
+            }
+
+            document.getElementById("savefile").addEventListener('click',function(){
+                if(enabled){
+                    WebCamera.snap(function(data_uri) {
+                        var imageBuffer = processBase64Image(data_uri);
+
+                        dialog.showSaveDialog({
+                            filters: [
+                                { name: 'Images', extensions: ['png'] },
+                            ]
+                        },function (fileName) {
+                               if (fileName === undefined){
+                                    console.log("You didn't save the file because you exit or didn't give a name");
+                                    return;
+                               }
+                               // If the user gave a name to the file, then save it !
+                               fs.writeFile(fileName, imageBuffer.data, function(err) {
+                                   if(err){
+                                       console.log("Cannot save the file :'( time to cry !");
+                                   }else{
+                                       alert("Image saved succesfully");
+                                   }
+                               });
+                        });
+        			});
+                }else{
+                    console.log("Please enable the camera first to take the snapshot !");
+                }
+            },false);
+      </script>
+  </body>
+</html>
