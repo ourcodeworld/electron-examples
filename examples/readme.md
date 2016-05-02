@@ -2,6 +2,6 @@
 
 Or install and start every example using :
 
-```javascript
+```bash
 npm install && npm start
 ```

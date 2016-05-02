@@ -1,7 +1,7 @@
 {
-  "name": "ourcodeworldelectron",
+  "name": "ourcodeworldelectron-webcamera",
   "version": "1.0.0",
-  "description": "A quick description of your project",
+  "description": "Example webcamera with electron",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js"
