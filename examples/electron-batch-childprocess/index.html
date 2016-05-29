@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Our Code World Rocks</title>
+  </head>
+  <body>
+    <h1>Our Code World execute .bat <span><img  style="height:40px;width:40px;" src="http://ourcodeworld.com/resources/img/ocw-empty.png"/></span></h1>
+    <br>
+    <button type="button" id="executeBat">Execute .bat file</button>
+    <button type="button" onclick="resetLog()">Clear log</button><br>
+    <ul id="log-container"></ul>
+    <script>'use strict';
+
+    function resetLog(){
+        return document.getElementById("log-container").innerHTML = "";
+    }
+
+    function addLog(message,type){
+        var el = document.getElementById("log-container");
+        var newItem = document.createElement("LI");       // Create a <li> node
+        var textnode = document.createTextNode(message);  // Create a text node
+        if(type == "error"){
+            newItem.style.color = "red";
+        }else if(type == "final"){
+            newItem.style.color = "blue";
+        }
+
+        newItem.appendChild(textnode);                    // Append the text to <li>
+        el.appendChild(newItem);
+    }
+
+    document.getElementById("executeBat").addEventListener("click",function(e){
+        var myBatFilePath = "C:\\Users\\SDkCarlos\\Desktop\\electrontest.bat";
+
+        const spawn = require('child_process').spawn;
+        const bat = spawn('cmd.exe', ['/c', myBatFilePath]);
+
+        bat.stdout.on('data', (data) => {
+            var str = String.fromCharCode.apply(null, data);
+            addLog(data);
+            console.info(str);
+        });
+
+        bat.stderr.on('data', (data) => {
+            var str = String.fromCharCode.apply(null, data);
+            addLog(data,"error");
+            console.error(str);
+        });
+
+        bat.on('exit', (code) => {
+            console.log(`Child exited with code ${code}`);
+            var preText = `Child exited with code ${code} : `;
+
+            switch(code){
+                case 0:
+                    addLog(preText+"Something unknown happened executing the batch.","final");
+                    break;
+                case 1:
+                    addLog(preText+"The file already exists","final");
+                    break;
+                case 2:
+                    addLog(preText+"The file doesn't exists and now is created","final");
+                    break;
+                case 3:
+                    addLog(preText+"An error ocurred while creating the file","final");
+                    break;
+            }
+        });
+    },false);
+    </script>
+  </body>
+</html>

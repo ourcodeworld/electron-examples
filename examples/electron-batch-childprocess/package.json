@@ -1,0 +1,14 @@
+{
+  "name": "ourcodeworldelectron",
+  "version": "1.0.0",
+  "description": "A quick description of your project",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "author": "Our Code World",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron-prebuilt": "^1.0.1"
+  }
+}
