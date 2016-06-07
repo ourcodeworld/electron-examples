@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Our Code World Rocks</title>
+    <script src="node_modules/artyom.js/src/artyom.min.js"></script>
+  </head>
+  <body>
+    <h1>Our Code World Voice commands and SpeechSynthesis<span><img  style="height:40px;width:40px;" src="http://ourcodeworld.com/resources/img/ocw-empty.png"/></span></h1>
+    <br>
+    <p>Use commands like : </p>
+    <ul>
+        <li>Hello or Hi</li>
+        <li>Write [Some text] in the console</li>
+        <li>Text content [Some text to set to the textarea]</li>
+    </ul>
+    <button type="button" onclick="StartArtyomOneCommand();">Start artyom one command</button>
+    <button type="button" onclick="StartArtyomContinuous();">Start artyom continuous assistant</button>
+    <br>
+    <button type="button" onclick="StopArtyom();">Stop recognition</button>
+    <br><br>
+    <h3>Speech Synthesis</h3>
+    <textarea id="text-content">Default text to read !</textarea><br>
+    <button type="button" onclick="ReadText();">Read text</button>
+
+    <script>'use strict';
+        window.onload = function(){
+
+            artyom.when("ERROR",function(err){
+                console.error("An error ocurred : ", err.code);
+            });
+
+            console.log("Artyom is ready");
+            // Important, add the commands to process.
+            artyom.addCommands([
+                {
+                    indexes:["Hello","Hi"],
+                    action: function(i){
+                        artyom.say("Hello, how are you today?");
+                    }
+                },
+                {
+                    indexes:["Say * please"],
+                    smart:true,
+                    action: function(i,wildcard,sentence){
+                        artyom.say(wildcard);
+                    }
+                },
+                {
+                    indexes:["Text content *"],
+                    smart:true,
+                    action: function(i,wildcard,sentence){
+                        document.getElementById("text-content").value = wildcard;
+                    }
+                },
+                {
+                    indexes:["write * in the console"],
+                    smart:true,
+                    action: function(i,wildcard,sentence){
+                        console.log(wildcard);
+                    }
+                }
+            ]);
+
+            artyom.say("Hello",{
+                onEnd: function(){
+                    console.log("I said hello !");
+                }
+            });
+        };
+
+        function StartArtyomOneCommand(){
+            console.log("One command");
+            if(artyom.isRecognizing()){
+                return alert("Stop artyom first !");
+            }
+
+            //Although the voice can't be changed,
+            // You need to set the language for the speech
+            // Recognition, see the documentation for more examples
+            return artyom.initialize({
+                lang:"en-GB",
+                debug:true,
+                continuous:false,
+                listen:true
+            });
+        }
+
+        function StartArtyomContinuous(){
+            console.log("Continuous commands");
+            if(artyom.isRecognizing()){
+                return alert("Stop artyom first !");
+            }
+
+            // You can create a permanent voice assistant
+            // if you want using the continuous mode !
+            return artyom.initialize({
+                lang:"en-GB",
+                debug:true,
+                continuous:false,
+                listen:true
+            });
+        }
+
+        function StopArtyom(){
+            artyom.fatality();
+        }
+
+        function ReadText(){
+            var content = document.getElementById("text-content").value;
+            if(!content){
+                content = "The textarea is empty. Please paste some text on it";
+            }
+
+            return artyom.say(content,{
+                onStart: function(){
+                    console.info("Text synthesis started.");
+                },
+                onEnd: function(){
+                    console.info("Text reading finished.");
+                }
+            });
+        }
+    </script>
+  </body>
+</html>
